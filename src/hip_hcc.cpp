@@ -896,9 +896,13 @@ hipError_t ihipDevice_t::initProperties(hipDeviceProp_t* prop) {
     }
 
     // Enable the cooperative group for GPUs that support all the required features
+#ifdef HSA_AMD_AGENT_INFO_COOPERATIVE_QUEUES // Old ROCr versions did not define or support this
     err = hsa_agent_get_info(_hsaAgent, (hsa_agent_info_t)HSA_AMD_AGENT_INFO_COOPERATIVE_QUEUES,
           &prop->cooperativeLaunch);
     DeviceErrorCheck(err);
+#else
+    prop->cooperativeLaunch = 0;
+#endif
     prop->cooperativeMultiDeviceLaunch = prop->cooperativeLaunch;
 
     prop->cooperativeMultiDeviceUnmatchedFunc = prop->cooperativeMultiDeviceLaunch;
